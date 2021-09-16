@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:velha/home.dart';
 import 'package:velha/velha.dart';
 
 class Principal extends StatefulWidget {
@@ -12,7 +13,7 @@ class _PrincipalState extends State<Principal> {
   @override
   Widget build(BuildContext context) {
     return PageView(
-      children: [Velha(), Container(color: Colors.amber)],
+      children: [Velha(), Home(), Container(color: Colors.amber)],
     );
   }
 }

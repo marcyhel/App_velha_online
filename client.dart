@@ -1,45 +1,23 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:mobx/mobx.dart';
-part 'mob_controle.g.dart';
-
-class Mob_Controle = _Mob_Controle with _$Mob_Controle;
-
-abstract class _Mob_Controle with Store {
-  @observable
-  String? nick;
-  @observable
-  Jogo jogo = Jogo("nick!");
-  @action
-  void strat() {
-    jogo = Jogo(nick!);
-  }
-
-  @action
-  void setNick(String valor) => nick = valor;
-}
+import 'dart:async';
+import 'dart:convert';
 
 class Jogo {
   String nick;
+  WebSocket ?soc;
   String? nickOponete;
-  WebSocket? soc;
   int id = 0;
   List<List<int>> tab = [
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0]
   ];
-
   Jogo(this.nick) {
-    try {
-      conecta();
-      print("conectado");
-    } catch (e) {
-      print("não conectado");
-    }
+    conecta();
   }
   void desenha() {
+    print("\x1B[2J\x1B[0;0H");
+    print("");
     print("oponente é $nickOponete");
     print('');
     if (id == 1) {
@@ -96,24 +74,23 @@ class Jogo {
     }
   }
 
-  Future<void> conecta() async {
+  void conecta() {
+
     WebSocket.connect("ws://186.207.129.17:8080").then((sock) {
-      print("tenta");
       //sock.add("Conectado");
       soc = sock;
       sock.listen(
         (message) {
           // print(message);
-
           chamadas(message, sock);
         },
       );
-      /*readLine().listen((e) {
+      readLine().listen((e) {
         processLine(e, sock);
-      });*/
+      });
       //send(sock);
     }).catchError((err) {
-      print("erro ");
+      print("erro $err");
       exit(1);
     });
   }
@@ -125,8 +102,13 @@ class Jogo {
   Stream<String> readLine() =>
       stdin.transform(utf8.decoder).transform(const LineSplitter());
 
-  void processLine(String line) {
+  void processLine(String line, sock) {
     soc!.add(json.encode({'id': 'jogada', 'jogada': line}));
     //print(line);
   }
+}
+
+void main() {
+  print("digite seu nick");
+  Jogo(stdin.readLineSync()!);
 }
