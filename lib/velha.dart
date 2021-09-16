@@ -26,26 +26,35 @@ class _VelhaState extends State<Velha> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Oponente: " + mob.jogo.nickOponete!),
+        title: mob.jogo==""?Text(""):Text("Oponente: " + mob.nickOponete!),
         centerTitle: true,
       ),
       body: Center(
         child: Observer(builder: (_) {
-          return Container(
-            child: Column(
+          return mob.jogo==""?Container():Container(
+            child: Observer(builder: (_) {
+          return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ...Iterable<int>.generate(mob.jogo.tab.length).map((int x) {
+                  (mob.id == 1)?Text("vc é o X",style: TextStyle(color:Colors.black45,fontWeight: FontWeight.bold,fontSize: 25),):Text("vc é o O",style: TextStyle(color:Colors.black45,fontWeight: FontWeight.bold,fontSize: 25),),
+                  Pontos(),
+                  SizedBox(height: 20,),
+                  (mob.id == mob.vez)?Text("Sua vez",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30),):Text("vez do oponente",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30),),
+                 SizedBox(height: 50,),
+                  ...Iterable<int>.generate(mob.tab.length).map((int x) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ...Iterable<int>.generate(mob.jogo.tab.length)
+                        ...Iterable<int>.generate(mob.tab.length)
                             .map((int i) {
-                          return BotaoCuston(
-                              valor: mob.jogo.tab[x][i],
+                          return  BotaoCuston(
+                              valor: mob.tab[x][i],
                               func: () {
-                                mob.jogo.processLine('$x $i');
+                                mob.processLine('$x $i');
+                                setState(() {
+                                  
+                                });
                                 print('$x $i');
                               });
                         })
@@ -53,7 +62,7 @@ class _VelhaState extends State<Velha> {
                     );
                   }),
                   SizedBox(
-                    height: 50,
+                    height: 20,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -61,17 +70,26 @@ class _VelhaState extends State<Velha> {
                       FlatButton(
                           onPressed: () {}, child: Text("jogar novamente")),
                       FlatButton(
-                          onPressed: () {}, child: Text("Sair da partida")),
+                          onPressed: () {mob.page=0;}, child: Text("Sair da partida")),
                     ],
                   )
-                ]),
+                ]);}),
           );
         }),
       ),
     );
   }
 }
+class Pontos extends StatelessWidget {
+  const Pontos({ Key? key }) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return   Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [Column(children: [Text("X",style: TextStyle(color:Colors.black45,fontWeight: FontWeight.bold,fontSize: 25),),Text("0",style: TextStyle(color:Colors.black45,fontWeight: FontWeight.bold,fontSize: 25),)],) ,Column(children: [Text("O",style: TextStyle(color:Colors.black45,fontWeight: FontWeight.bold,fontSize: 25),),Text("0",style: TextStyle(color:Colors.black45,fontWeight: FontWeight.bold,fontSize: 25),)],)],);
+  }
+}
 class BotaoCuston extends StatelessWidget {
   int valor;
   Function func;
@@ -83,7 +101,8 @@ class BotaoCuston extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Observer(builder: (_) {
+          return Container(
       margin: EdgeInsets.all(10),
       child: Material(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -114,6 +133,6 @@ class BotaoCuston extends StatelessWidget {
           ),
         ),
       ),
-    );
+    );});
   }
 }

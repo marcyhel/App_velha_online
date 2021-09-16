@@ -8,23 +8,155 @@ class Mob_Controle = _Mob_Controle with _$Mob_Controle;
 
 abstract class _Mob_Controle with Store {
   @observable
-  String? nick;
+  int page=0;
   @observable
-  Jogo jogo = Jogo("nick!");
+  bool espera=false;
+  @observable
+  String nick="";
+  @observable
+  int vez=0;
+  @observable
+  dynamic jogo = "";
+
   @action
   void strat() {
-    jogo = Jogo(nick!);
+    tab = ObservableList<ObservableList<int>>.of( [
+    ObservableList.of([0, 0, 0]),
+    ObservableList.of([0, 0, 0]),
+    ObservableList.of([0, 0, 0]),
+  ]);
+     try {
+      conecta();
+      jogo=556;
+      print("conectado");
+    } catch (e) {
+      print("não conectado");
+    }
+  }
+  
+  @observable
+  String? nickOponete;
+  WebSocket? soc;
+  @observable
+  int id = 0;
+  @observable
+  var tab = ObservableList<ObservableList<int>>.of( [
+    ObservableList.of([0, 0, 0]),
+    ObservableList.of([0, 0, 0]),
+    ObservableList.of([0, 0, 0]),
+  ]);
+
+  @action
+  void setTab(x,y,valo) {
+    tab[x][y] = valo;
+  }
+  void desenha() {
+    print("oponente é $nickOponete");
+    print('');
+    if (id == 1) {
+      print('vc é o X');
+    }
+    if (id == 2) {
+      print('vc é o O');
+    }
+
+    stdout.write('  0 1 2');
+    print('');
+    for (var i = 0; i < tab.length; i++) {
+      for (var j = 0; j < tab.length; j++) {
+        if (j == 0) {
+          stdout.write(i.toString() + " ");
+        }
+        if (tab[i][j] == 1) {
+          stdout.write('X' + ' ');
+        } else if (tab[i][j] == 2) {
+          stdout.write('O' + ' ');
+        } else {
+          stdout.write('-' + ' ');
+        }
+      }
+      print('');
+    }
+  }
+
+  void chamadas(msns, sock) {
+    var msn = json.decode(msns);
+    if (msn['id'] == "id") {
+      id = (msn['ident']);
+      sock.add(json.encode({'id': 'nick', 'nick': nick}));
+    }
+    if (msn['id'] == "nickOP") {
+      nickOponete = msn['nick'];
+      print("oponente é $nickOponete");
+      page=1;
+    }
+    if (msn['id'] == 'vez') {
+      vez=msn['vez'];
+      if (id == msn['vez']) {
+        
+        print("Sua vez");
+      } else {
+        print("Vez do oponete");
+      }
+    }
+    if (msn['id'] == "erro") {
+      print(msn['erro']);
+    }
+    if (msn['id'] == 'desenha') {
+      desenha();
+    }
+    if (msn['id'] == 'att') {
+      tab[msn['x']][msn['y']] = msn['marc'];
+      setTab(msn['x'],msn['y'],msn['marc']);
+    }
+  }
+
+  Future<void> conecta() async {
+    WebSocket.connect("ws://192.168.100.65:8080").then((sock) {
+      print("tenta");
+      //sock.add("Conectado");
+      soc = sock;
+      sock.listen(
+        (message) {
+          // print(message);
+
+          chamadas(message, sock);
+        },
+      );
+      /*readLine().listen((e) {
+        processLine(e, sock);
+      });*/
+      //send(sock);
+    }).catchError((err) {
+      print("erro ");
+      exit(1);
+    });
+  }
+
+  Future<void> send(sock) async {
+    sock.add(stdin.readLineSync());
+  }
+
+  Stream<String> readLine() =>
+      stdin.transform(utf8.decoder).transform(const LineSplitter());
+
+  void processLine(String line) {
+    soc!.add(json.encode({'id': 'jogada', 'jogada': line}));
+    //print(line);
   }
 
   @action
   void setNick(String valor) => nick = valor;
 }
-
+/*
 class Jogo {
+  @observable
   String nick;
+  @observable
   String? nickOponete;
   WebSocket? soc;
   int id = 0;
+  @observable
   List<List<int>> tab = [
     [0, 0, 0],
     [0, 0, 0],
@@ -97,7 +229,7 @@ class Jogo {
   }
 
   Future<void> conecta() async {
-    WebSocket.connect("ws://186.207.129.17:8080").then((sock) {
+    WebSocket.connect("ws://192.168.100.65:8080").then((sock) {
       print("tenta");
       //sock.add("Conectado");
       soc = sock;
@@ -130,3 +262,4 @@ class Jogo {
     //print(line);
   }
 }
+*/
