@@ -8,48 +8,57 @@ class Mob_Controle = _Mob_Controle with _$Mob_Controle;
 
 abstract class _Mob_Controle with Store {
   @observable
-  int page=0;
+  int page = 0;
   @observable
-  bool espera=false;
+  bool espera = false;
   @observable
-  String nick="";
+  String nick = "";
   @observable
-  int vez=0;
+  int vez = 0;
   @observable
   dynamic jogo = "";
+  @observable
+  bool fin = false;
+  @observable
+  int pontos_x = 0;
+  @observable
+  int pontos_o = 0;
 
   @action
   void strat() {
-    tab = ObservableList<ObservableList<int>>.of( [
-    ObservableList.of([0, 0, 0]),
-    ObservableList.of([0, 0, 0]),
-    ObservableList.of([0, 0, 0]),
-  ]);
-     try {
+    pontos_o = 0;
+    pontos_x = 0;
+    tab = ObservableList<ObservableList<int>>.of([
+      ObservableList.of([0, 0, 0]),
+      ObservableList.of([0, 0, 0]),
+      ObservableList.of([0, 0, 0]),
+    ]);
+    try {
       conecta();
-      jogo=556;
+      jogo = 556;
       print("conectado");
     } catch (e) {
       print("não conectado");
     }
   }
-  
+
   @observable
   String? nickOponete;
   WebSocket? soc;
   @observable
   int id = 0;
   @observable
-  var tab = ObservableList<ObservableList<int>>.of( [
+  var tab = ObservableList<ObservableList<int>>.of([
     ObservableList.of([0, 0, 0]),
     ObservableList.of([0, 0, 0]),
     ObservableList.of([0, 0, 0]),
   ]);
 
   @action
-  void setTab(x,y,valo) {
+  void setTab(x, y, valo) {
     tab[x][y] = valo;
   }
+
   void desenha() {
     print("oponente é $nickOponete");
     print('');
@@ -88,12 +97,11 @@ abstract class _Mob_Controle with Store {
     if (msn['id'] == "nickOP") {
       nickOponete = msn['nick'];
       print("oponente é $nickOponete");
-      page=1;
+      page = 1;
     }
     if (msn['id'] == 'vez') {
-      vez=msn['vez'];
+      vez = msn['vez'];
       if (id == msn['vez']) {
-        
         print("Sua vez");
       } else {
         print("Vez do oponete");
@@ -107,12 +115,30 @@ abstract class _Mob_Controle with Store {
     }
     if (msn['id'] == 'att') {
       tab[msn['x']][msn['y']] = msn['marc'];
-      setTab(msn['x'],msn['y'],msn['marc']);
+      setTab(msn['x'], msn['y'], msn['marc']);
+    }
+    if (msn['id'] == 'fim') {
+      print(msn['msn']);
+      fin = true;
+    }
+    if (msn['id'] == 'reset') {
+      fin = false;
+
+      vez = msn['vez'];
+      tab = ObservableList<ObservableList<int>>.of([
+        ObservableList.of([0, 0, 0]),
+        ObservableList.of([0, 0, 0]),
+        ObservableList.of([0, 0, 0]),
+      ]);
+    }
+    if (msn['id'] == 'pontos') {
+      pontos_o = msn['o'];
+      pontos_x = msn['x'];
     }
   }
 
   Future<void> conecta() async {
-    WebSocket.connect("ws://192.168.100.65:8080").then((sock) {
+    WebSocket.connect("ws://186.207.129.17:8080").then((sock) {
       print("tenta");
       //sock.add("Conectado");
       soc = sock;
@@ -142,6 +168,11 @@ abstract class _Mob_Controle with Store {
 
   void processLine(String line) {
     soc!.add(json.encode({'id': 'jogada', 'jogada': line}));
+    //print(line);
+  }
+
+  void processReset() {
+    soc!.add(json.encode({'id': 'reset'}));
     //print(line);
   }
 

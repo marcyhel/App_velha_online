@@ -4,7 +4,7 @@ import 'dart:convert';
 
 class Jogo {
   String nick;
-  WebSocket ?soc;
+  WebSocket? soc;
   String? nickOponete;
   int id = 0;
   List<List<int>> tab = [
@@ -72,11 +72,13 @@ class Jogo {
     if (msn['id'] == 'att') {
       tab[msn['x']][msn['y']] = msn['marc'];
     }
+    if (msn['id'] == 'fim') {
+      print(msn['msn']);
+    }
   }
 
   void conecta() {
-
-    WebSocket.connect("ws://186.207.129.17:8080").then((sock) {
+    WebSocket.connect("ws://192.168.100.65:8080").then((sock) {
       //sock.add("Conectado");
       soc = sock;
       sock.listen(

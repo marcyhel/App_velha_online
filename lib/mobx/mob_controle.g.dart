@@ -84,6 +84,51 @@ mixin _$Mob_Controle on _Mob_Controle, Store {
     });
   }
 
+  final _$finAtom = Atom(name: '_Mob_Controle.fin');
+
+  @override
+  bool get fin {
+    _$finAtom.reportRead();
+    return super.fin;
+  }
+
+  @override
+  set fin(bool value) {
+    _$finAtom.reportWrite(value, super.fin, () {
+      super.fin = value;
+    });
+  }
+
+  final _$pontos_xAtom = Atom(name: '_Mob_Controle.pontos_x');
+
+  @override
+  int get pontos_x {
+    _$pontos_xAtom.reportRead();
+    return super.pontos_x;
+  }
+
+  @override
+  set pontos_x(int value) {
+    _$pontos_xAtom.reportWrite(value, super.pontos_x, () {
+      super.pontos_x = value;
+    });
+  }
+
+  final _$pontos_oAtom = Atom(name: '_Mob_Controle.pontos_o');
+
+  @override
+  int get pontos_o {
+    _$pontos_oAtom.reportRead();
+    return super.pontos_o;
+  }
+
+  @override
+  set pontos_o(int value) {
+    _$pontos_oAtom.reportWrite(value, super.pontos_o, () {
+      super.pontos_o = value;
+    });
+  }
+
   final _$nickOponeteAtom = Atom(name: '_Mob_Controle.nickOponete');
 
   @override
@@ -173,6 +218,9 @@ espera: ${espera},
 nick: ${nick},
 vez: ${vez},
 jogo: ${jogo},
+fin: ${fin},
+pontos_x: ${pontos_x},
+pontos_o: ${pontos_o},
 nickOponete: ${nickOponete},
 id: ${id},
 tab: ${tab}
